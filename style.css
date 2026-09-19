@@ -1,0 +1,214 @@
+  :root{
+    --void:#0a0118;
+    --deep:#170a2e;
+    --deep-2:#230f42;
+    --magenta:#ff2ec4;
+    --pink:#ff8fd8;
+    --violet:#b026ff;
+    --glass:rgba(255,255,255,.055);
+    --glass-border:rgba(255,143,216,.28);
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 80% 60% at 15% -10%, rgba(176,38,255,.35), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 90% 10%, rgba(255,46,196,.22), transparent 55%),
+      radial-gradient(ellipse 90% 70% at 50% 120%, rgba(176,38,255,.25), transparent 60%),
+      var(--void);
+    color:#f3e8fb;
+    font-family:'Poppins',sans-serif;
+    overflow-x:hidden;
+    min-height:100vh;
+  }
+
+  h1,h2,h3,.font-display{font-family:'Orbitron',sans-serif}
+
+  /* ---------- Reduced motion respect ---------- */
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
+  }
+
+  /* ---------- Background canvas ---------- */
+  #particles{position:fixed; inset:0; z-index:0; pointer-events:none;}
+
+  /* ---------- Petals layer ---------- */
+  #petal-layer{position:fixed; inset:0; z-index:5; pointer-events:none; overflow:hidden;}
+  .petal{
+    position:absolute; top:-40px; pointer-events:auto; cursor:pointer;
+    filter:drop-shadow(0 0 6px rgba(255,143,216,.7));
+    animation:fall linear forwards;
+    will-change:transform;
+  }
+  @keyframes fall{
+    to{ transform:translateY(115vh) translateX(var(--drift,0px)) rotate(var(--spin,180deg)); }
+  }
+  .petal-burst{ animation:burst .5s ease-out forwards !important; }
+  @keyframes burst{
+    to{ transform:scale(2.2) rotate(90deg); opacity:0; }
+  }
+
+  /* ---------- Glass surfaces ---------- */
+  .glass{
+    background:var(--glass);
+    backdrop-filter:blur(18px) saturate(140%);
+    -webkit-backdrop-filter:blur(18px) saturate(140%);
+    border:1px solid var(--glass-border);
+    box-shadow:0 0 0 1px rgba(255,46,196,.06) inset, 0 20px 60px -20px rgba(176,38,255,.45);
+  }
+
+  .neon-text{
+    color:#fff;
+    text-shadow:0 0 6px var(--magenta), 0 0 22px rgba(255,46,196,.6), 0 0 46px rgba(176,38,255,.35);
+  }
+
+  .neon-line{ box-shadow:0 0 10px var(--magenta), 0 0 22px var(--violet); }
+
+  /* ---------- Tulip clip / border shapes ---------- */
+  .tulip-frame{
+    clip-path: path('M100 4 C60 4 40 40 40 74 C40 104 60 122 100 156 C140 122 160 104 160 74 C160 40 140 4 100 4 Z');
+  }
+
+  /* ---------- Login input tulip-notched border ---------- */
+  .tulip-input{
+    background:rgba(255,255,255,.04);
+    border:1.5px solid rgba(255,143,216,.35);
+    border-radius:999px 999px 6px 6px / 30px 30px 6px 6px;
+    transition:border-color .25s ease, box-shadow .25s ease, background .25s ease;
+  }
+  .tulip-input:focus{
+    outline:none;
+    border-color:var(--magenta);
+    box-shadow:0 0 0 3px rgba(255,46,196,.15), 0 0 18px rgba(255,46,196,.45);
+    background:rgba(255,255,255,.07);
+  }
+
+  /* ---------- Heartbeat button ---------- */
+  .heart-btn{
+    position:relative;
+    background:linear-gradient(135deg,var(--magenta),var(--violet));
+    box-shadow:0 0 22px rgba(255,46,196,.55);
+    animation:heartbeat 1.8s ease-in-out infinite;
+  }
+  .heart-btn:hover{ animation-duration:.9s; box-shadow:0 0 34px rgba(255,46,196,.85); }
+  @keyframes heartbeat{
+    0%,100%{ transform:scale(1); }
+    14%{ transform:scale(1.06); }
+    28%{ transform:scale(1); }
+    42%{ transform:scale(1.05); }
+    70%{ transform:scale(1); }
+  }
+
+  /* ---------- Login shell entrance / exit ---------- */
+  #login-screen{ transition:opacity .9s ease, filter .9s ease; }
+  #login-screen.bloom-out{
+    opacity:0; filter:blur(20px);
+    pointer-events:none;
+  }
+  .login-card{ animation:rise .8s cubic-bezier(.2,.9,.3,1.2) both; }
+  @keyframes rise{ from{ opacity:0; transform:translateY(26px) scale(.97);} to{opacity:1; transform:translateY(0) scale(1);} }
+
+  #app{ opacity:0; transition:opacity 1s ease; }
+  #app.visible{ opacity:1; }
+
+  /* ---------- Gallery frames ---------- */
+  .frame-card{
+    transition:transform .35s ease, box-shadow .35s ease;
+  }
+  .frame-card:hover{ transform:translateY(-8px) rotate(-0.5deg); box-shadow:0 26px 60px -18px rgba(255,46,196,.55); }
+
+  /* ---------- Section divider tulip ---------- */
+  .divider-tulip{ filter:drop-shadow(0 0 10px rgba(255,46,196,.6)); }
+
+  /* ---------- Typewriter caret ---------- */
+  .caret::after{
+    content:'';
+    display:inline-block; width:2px; height:1em; margin-left:2px;
+    background:var(--magenta); vertical-align:-.15em;
+    animation:blink 1s steps(1) infinite;
+  }
+  @keyframes blink{ 50%{opacity:0;} }
+
+  /* ---------- Wheel ---------- */
+  #wheel-wrap{ transition:transform 4.2s cubic-bezier(.15,.85,.15,1); }
+
+  /* ---------- Trivia flip ---------- */
+  .flip-card{ perspective:1200px; }
+  .flip-inner{ transition:transform .6s; transform-style:preserve-3d; }
+  .flip-card.flipped .flip-inner{ transform:rotateY(180deg); }
+  .flip-front,.flip-back{ backface-visibility:hidden; }
+  .flip-back{ transform:rotateY(180deg); }
+
+  /* ---------- Scrollbar ---------- */
+  ::-webkit-scrollbar{ width:10px; }
+  ::-webkit-scrollbar-track{ background:var(--void); }
+  ::-webkit-scrollbar-thumb{ background:linear-gradient(var(--magenta),var(--violet)); border-radius:8px; }
+
+  /* focus visibility for accessibility */
+  a:focus-visible, button:focus-visible, input:focus-visible{
+    outline:2px solid var(--pink); outline-offset:3px;
+  }
+
+  /* ---------- Stickers decorativos ---------- */
+  #sticker-layer{
+    position:absolute; inset:0; z-index:35;
+    pointer-events:none; overflow:hidden;
+  }
+  .sticker{
+    position:absolute;
+    width:var(--s,90px); height:auto;
+    border-radius:10px;
+    transform:rotate(var(--r,0deg));
+    user-select:none;
+    /* borde blanco tipo sticker + sombra suave */
+    filter:
+      drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff)
+      drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff)
+      drop-shadow(0 8px 12px rgba(0,0,0,.5));
+    animation:stick .5s cubic-bezier(.2,.9,.3,1.3) var(--d,0s) both;
+  }
+  @keyframes stick{
+    from{ opacity:0; transform:rotate(var(--r,0deg)) scale(1.5); }
+    to{   opacity:1; transform:rotate(var(--r,0deg)) scale(1); }
+  }
+
+  /* ---------- Editor de la rueda ---------- */
+  .we-input{
+    background:rgba(255,255,255,.05);
+    border:1.5px solid rgba(255,143,216,.3);
+    border-radius:12px;
+    color:#fff;
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  .we-input::placeholder{ color:rgba(255,255,255,.3); }
+  .we-input:focus{
+    outline:none;
+    border-color:var(--magenta);
+    box-shadow:0 0 0 3px rgba(255,46,196,.15);
+  }
+  .we-input:disabled{ opacity:.5; cursor:not-allowed; }
+  .we-del{
+    color:rgba(255,143,216,.7);
+    font-size:1.25rem; line-height:1;
+    padding:.25rem .5rem; border-radius:8px;
+    transition:color .2s ease, background .2s ease;
+  }
+  .we-del:hover:not(:disabled){ color:#fff; background:rgba(255,46,196,.25); }
+  .we-del:disabled{ opacity:.25; cursor:not-allowed; }
+
+  /* botón sin latido (para el modal) y estado deshabilitado */
+  .heart-btn.calm{ animation:none; }
+  .heart-btn:disabled{ opacity:.6; cursor:not-allowed; animation:none; }
+
+  /* ---------- Sacudida al escribir mal la fecha ---------- */
+  .shake{ animation:shake .45s ease; }
+  @keyframes shake{
+    0%,100%{ transform:translateX(0); }
+    20%{ transform:translateX(-9px); }
+    40%{ transform:translateX(8px); }
+    60%{ transform:translateX(-6px); }
+    80%{ transform:translateX(4px); }
+  }

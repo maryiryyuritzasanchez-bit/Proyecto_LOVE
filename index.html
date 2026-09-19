@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modo Amor // Acceso Cyber-Romance</title>
+
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+<!-- Supabase (guardado de fotos en la nube) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+<div id="petal-layer"></div>
+
+<!-- ============ PANTALLA DE LOGIN ============ -->
+<div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <form id="login-form" class="login-card glass w-full max-w-sm rounded-3xl px-8 pt-16 pb-10 relative">
+
+    <!-- tulipán holográfico decorativo -->
+    <svg class="absolute -top-2 left-1/2 -translate-x-1/2" width="72" height="86" viewBox="0 0 100 120" fill="none">
+      <defs>
+        <linearGradient id="tulipGrad" x1="0" y1="0" x2="100" y2="120" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#ff2ec4"/>
+          <stop offset="1" stop-color="#b026ff"/>
+        </linearGradient>
+      </defs>
+      <path d="M50 2C30 2 20 20 20 37c0 15 10 24 30 46 20-22 30-31 30-46C80 20 70 2 50 2Z" stroke="url(#tulipGrad)" stroke-width="2.4" fill="rgba(255,46,196,.12)"/>
+      <path d="M50 83v33M50 96c-10-2-16-10-16-10M50 104c10-2 16-9 16-9" stroke="url(#tulipGrad)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+    </svg>
+
+    <h1 class="font-display text-center text-xl sm:text-2xl tracking-wide neon-text mb-1">ACCESO DE PAREJA</h1>
+    <p class="text-center text-pink-200/70 text-xs tracking-[0.25em] mb-8">MODO&nbsp;AMOR&nbsp;· &nbsp;PROTOCOLO&nbsp;PRIVADO</p>
+
+    <label class="block text-xs uppercase tracking-widest text-pink-200/70 mb-1.5" for="user">Usuario</label>
+    <input id="user" type="text" autocomplete="off" placeholder="tu nombre en clave"
+      class="tulip-input w-full px-4 py-3 mb-5 text-sm text-white placeholder:text-white/30" required>
+
+    <label class="block text-xs uppercase tracking-widest text-pink-200/70 mb-1.5" for="pass">Contraseña</label>
+    <input id="pass" type="password" autocomplete="off" placeholder="nuestra palabra secreta"
+      class="tulip-input w-full px-4 py-3 mb-2 text-sm text-white placeholder:text-white/30" required>
+
+    <p id="login-error" class="text-xs text-pink-300/0 h-4 mb-2 transition-opacity"></p>
+
+    <button type="submit" class="heart-btn w-full mt-4 py-3 rounded-full font-display text-sm tracking-widest text-white">
+      ♥ ENTRAR AL MODO AMOR
+    </button>
+
+    <p class="text-center text-[11px] text-white/30 mt-5 leading-relaxed">
+      Solo para dos personas ♥
+    </p>
+  </form>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app" class="relative z-10">
+
+  <!-- STICKERS decorativos (se generan con JS) -->
+  <div id="sticker-layer" aria-hidden="true"></div>
+
+  <!-- NAV -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-black/20 border-b border-pink-400/10">
+    <nav class="max-w-6xl mx-auto flex items-center justify-between px-5 py-4">
+      <span class="font-display text-sm tracking-[0.3em] neon-text">MODO&nbsp;AMOR</span>
+      <div class="hidden sm:flex gap-7 text-xs tracking-widest uppercase text-pink-100/70">
+        <a href="#galeria" class="hover:text-white transition">Galería</a>
+        <a href="#poesia" class="hover:text-white transition">Poesía</a>
+        <a href="#juegos" class="hover:text-white transition">Juegos</a>
+        <a href="#secreto" class="hover:text-white transition">Secreto</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="max-w-5xl mx-auto px-5 pt-16 pb-20 text-center">
+    <svg class="mx-auto mb-6 divider-tulip" width="90" height="108" viewBox="0 0 100 120" fill="none">
+      <path d="M50 2C30 2 20 20 20 37c0 15 10 24 30 46 20-22 30-31 30-46C80 20 70 2 50 2Z" stroke="url(#tulipGrad)" stroke-width="2.4" fill="rgba(255,46,196,.14)"/>
+      <path d="M50 83v33" stroke="url(#tulipGrad)" stroke-width="2.2" stroke-linecap="round"/>
+    </svg>
+    <h1 class="font-display text-3xl sm:text-5xl neon-text leading-tight">Bienvenidos a nuestro<br>refugio holográfico</h1>
+    <p class="text-pink-100/60 mt-5 max-w-md mx-auto text-sm sm:text-base">
+      Un rincón privado, cifrado en pétalos de neón, hecho para guardar lo que sentimos.
+    </p>
+  </section>
+
+  <!-- GALERÍA -->
+  <section id="galeria" class="max-w-6xl mx-auto px-5 py-16">
+    <div class="flex items-center gap-4 mb-10">
+      <span class="h-px flex-1 neon-line bg-pink-400/30"></span>
+      <h2 class="font-display text-xl sm:text-2xl neon-text whitespace-nowrap">Galería de momentos</h2>
+      <span class="h-px flex-1 neon-line bg-pink-400/30"></span>
+    </div>
+
+    <div class="glass rounded-2xl p-5 mb-8 flex flex-col sm:flex-row items-center gap-4 justify-between">
+      <p id="gallery-note" class="text-xs text-pink-100/60" aria-live="polite">Sube fotos de sus momentos ♥</p>
+      <label class="heart-btn cursor-pointer text-xs font-display tracking-widest px-5 py-2.5 rounded-full text-white whitespace-nowrap">
+        + SUBIR RECUERDO
+        <input id="photo-input" type="file" accept="image/*" multiple class="hidden">
+      </label>
+    </div>
+
+    <div id="gallery-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5"></div>
+  </section>
+
+  <!-- POESÍA -->
+  <section id="poesia" class="max-w-4xl mx-auto px-5 py-16">
+    <div class="flex items-center gap-4 mb-10">
+      <span class="h-px flex-1 neon-line bg-pink-400/30"></span>
+      <h2 class="font-display text-xl sm:text-2xl neon-text whitespace-nowrap">Poesía romántica</h2>
+      <span class="h-px flex-1 neon-line bg-pink-400/30"></span>
+    </div>
+
+    <div class="flex justify-center gap-3 mb-5" id="poem-langs"></div>
+
+    <div class="flex flex-wrap gap-3 justify-center mb-8" id="poem-buttons"></div>
+
+    <div class="glass rounded-2xl px-6 sm:px-10 py-10 min-h-[220px] flex items-center justify-center">
+      <p id="poem-display" class="font-display text-center text-lg sm:text-xl leading-relaxed text-pink-50 whitespace-pre-line caret"></p>
+    </div>
+  </section>
+
+  <!-- JUEGOS -->
+  <section id="juegos" class="max-w-6xl mx-auto px-5 py-16">
+    <div class="flex items-center gap-4 mb-10">
+      <span class="h-px flex-1 neon-line bg-pink-400/30"></span>
+      <h2 class="font-display text-xl sm:text-2xl neon-text whitespace-nowrap">Zona de juegos de amor</h2>
+      <span class="h-px flex-1 neon-line bg-pink-400/30"></span>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-8">
+
+      <!-- TEST DE COMPATIBILIDAD -->
+      <div class="glass rounded-2xl p-6 flex flex-col">
+        <h3 class="font-display text-sm tracking-widest neon-text mb-4">TEST DE COMPATIBILIDAD</h3>
+        <div id="quiz-body" class="flex-1"></div>
+      </div>
+
+      <!-- RUEDA DE CITAS -->
+      <div class="glass rounded-2xl p-6 flex flex-col items-center">
+        <h3 class="font-display text-sm tracking-widest neon-text mb-4 self-start">RUEDA DE PREGUNTAS</h3>
+        <div class="relative w-56 h-56 mx-auto my-2">
+          <div class="absolute -top-2 left-1/2 -translate-x-1/2 z-10 w-0 h-0
+                      border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent
+                      border-t-[16px]" style="border-top-color:var(--magenta)"></div>
+          <div id="wheel-wrap" class="w-full h-full rounded-full" style="transform:rotate(0deg)"></div>
+        </div>
+        <button id="spin-btn" class="heart-btn mt-3 px-6 py-2.5 rounded-full font-display text-xs tracking-widest text-white">GIRAR</button>
+        <p id="wheel-result" class="text-center text-pink-100/80 text-sm mt-4 min-h-[3em] leading-relaxed" aria-live="polite"></p>
+        <button id="edit-wheel-btn" type="button" class="mt-3 text-xs underline text-pink-200/70 hover:text-white">✎ editar preguntas de la rueda</button>
+      </div>
+
+      <!-- TRIVIA SECRETA -->
+      <div class="glass rounded-2xl p-6 flex flex-col">
+        <h3 class="font-display text-sm tracking-widest neon-text mb-4">TRIVIA DE PAREJA</h3>
+        <p class="text-xs text-pink-100/50 mb-4">Toca una carta para revelar la pregunta secreta.</p>
+        <div id="trivia-grid" class="grid grid-cols-2 gap-3"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PÁGINA SECRETA -->
+  <section id="secreto" class="max-w-xl mx-auto px-5 py-16">
+    <div class="flex items-center gap-4 mb-10">
+      <span class="h-px flex-1 neon-line bg-pink-400/30"></span>
+      <h2 class="font-display text-xl sm:text-2xl neon-text whitespace-nowrap">Página secreta</h2>
+      <span class="h-px flex-1 neon-line bg-pink-400/30"></span>
+    </div>
+
+    <div class="glass rounded-2xl p-8 text-center">
+      <p class="text-sm text-pink-100/70 leading-relaxed mb-6">
+        Hay algo esperándote en la siguiente página.<br>
+        Solo se abre con una fecha muy especial ♥
+      </p>
+      <a href="siguiente.html" class="heart-btn inline-block px-8 py-3 rounded-full font-display text-xs tracking-widest text-white">
+        SIGUIENTE PÁGINA →
+      </a>
+    </div>
+  </section>
+
+  <footer class="text-center text-[11px] text-white/25 py-10">
+    hecho con pétalos de código, para dos personas · modo amor
+  </footer>
+</div>
+
+<!-- ============ EDITOR DE LA RUEDA ============ -->
+<div id="wheel-editor" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+  <div class="glass rounded-3xl w-full max-w-lg max-h-[88vh] flex flex-col p-6" style="background:rgba(23,10,46,.94)">
+    <div class="flex items-center justify-between mb-1">
+      <h3 class="font-display text-sm tracking-widest neon-text">EDITAR RUEDA</h3>
+      <button id="editor-close" type="button" class="text-white/70 hover:text-white text-3xl leading-none" aria-label="Cerrar">&times;</button>
+    </div>
+    <p class="text-xs text-pink-100/60 mb-1">Cambia el texto, borra o agrega preguntas (mínimo 2, máximo 50).</p>
+    <p id="editor-count" class="text-xs text-pink-200/80 mb-4"></p>
+
+    <div class="flex gap-2 mb-4">
+      <input id="editor-new" type="text" maxlength="90" placeholder="Escribe una pregunta nueva…" class="we-input flex-1 min-w-0 px-3 py-2 text-xs">
+      <button id="editor-add" type="button" class="heart-btn calm px-4 rounded-full font-display text-[11px] tracking-widest text-white">AGREGAR</button>
+    </div>
+
+    <div id="editor-list" class="flex-1 overflow-y-auto pr-1 flex flex-col gap-2"></div>
+
+    <button id="editor-reset" type="button" class="mt-4 self-start text-xs underline text-pink-200/70 hover:text-white">restaurar preguntas originales</button>
+  </div>
+</div>
+
+<!-- ============ LIGHTBOX ============ -->
+<div id="lightbox" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/80 backdrop-blur-sm p-6">
+  <img id="lightbox-img" class="max-h-[85vh] max-w-full rounded-xl shadow-2xl" style="box-shadow:0 0 60px rgba(255,46,196,.5)">
+  <button id="lightbox-close" class="absolute top-5 right-6 text-white/70 hover:text-white text-3xl leading-none">&times;</button>
+</div>
+
+<script>
+/* ============================================================
+   1. LOGIN
+   ============================================================ */
+const loginScreen = document.getElementById('login-screen');
+const loginForm   = document.getElementById('login-form');
+const loginError  = document.getElementById('login-error');
+const app         = document.getElementById('app');
+
+// Credenciales de acceso (sin distinguir mayúsculas ni espacios extra)
+const VALID_USER = 'juliana';
+const VALID_PASS = 'te cielo';
+
+function normalize(str){
+  return str.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+loginForm.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const user = normalize(document.getElementById('user').value);
+  const pass = normalize(document.getElementById('pass').value);
+
+  if(user === VALID_USER && pass === VALID_PASS){
+    loginError.classList.remove('text-pink-300');
+    loginError.classList.add('text-pink-300/0');
+    loginScreen.classList.add('bloom-out');
+    setTimeout(()=>{ loginScreen.style.display='none'; }, 950);
+    app.classList.add('visible');
+    startPetals();
+    initStickers();
+  } else {
+    loginError.textContent = 'Usuario o contraseña incorrectos ♥';
+    loginError.classList.remove('text-pink-300/0');
+    loginError.classList.add('text-pink-300');
+    document.getElementById('pass').value = '';
+  }
+});
+
+/* ============================================================
+   2. PARTÍCULAS DE FONDO (canvas)
+   ============================================================ */
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function initParticles(){
+  const count = window.innerWidth < 640 ? 45 : 90;
+  particles = Array.from({length:count}, ()=>({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    r: Math.random()*1.8 + .4,
+    vy: -(Math.random()*.35 + .08),
+    vx: (Math.random()-.5)*.15,
+    hue: Math.random() > .5 ? '255,46,196' : '176,38,255',
+    a: Math.random()*.5 + .2
+  }));
+}
+initParticles();
+
+function drawParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.y += p.vy; p.x += p.vx;
+    if(p.y < -10) p.y = canvas.height + 10;
+    if(p.x < -10) p.x = canvas.width + 10;
+    if(p.x > canvas.width+10) p.x = -10;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(${p.hue},${p.a})`;
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = `rgba(${p.hue},.8)`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+/* ============================================================
+   3. PÉTALOS INTERACTIVOS
+   ============================================================ */
+const petalLayer = document.getElementById('petal-layer');
+let petalTimer = null;
+
+function makePetal(){
+  const petal = document.createElement('div');
+  petal.className = 'petal';
+  const size = 14 + Math.random()*14;
+  const left = Math.random()*100;
+  const duration = 7 + Math.random()*6;
+  const drift = (Math.random()-.5)*160;
+  const spin = 160 + Math.random()*300;
+  const hue = Math.random() > .5 ? '#ff2ec4' : '#b026ff';
+
+  petal.style.left = left+'vw';
+  petal.style.width = size+'px';
+  petal.style.height = size+'px';
+  petal.style.animationDuration = duration+'s';
+  petal.style.setProperty('--drift', drift+'px');
+  petal.style.setProperty('--spin', spin+'deg');
+
+  petal.innerHTML = `<svg viewBox="0 0 32 32" width="100%" height="100%">
+      <path d="M16 2C8 2 4 10 4 16c0 7 6 10 12 14 6-4 12-7 12-14 0-6-4-14-12-14Z" fill="${hue}" opacity=".85"/>
+    </svg>`;
+
+  petal.addEventListener('click', ()=>{
+    petal.classList.add('petal-burst');
+    setTimeout(()=>petal.remove(), 500);
+  });
+
+  petalLayer.appendChild(petal);
+  setTimeout(()=>petal.remove(), duration*1000 + 200);
+}
+
+function startPetals(){
+  if(petalTimer) return;
+  for(let i=0;i<6;i++) setTimeout(makePetal, i*400);
+  petalTimer = setInterval(makePetal, window.innerWidth < 640 ? 1600 : 1000);
+}
+
+/* ============================================================
+   4. GALERÍA — fotos guardadas en la nube para verlas en cualquier dispositivo
+   ============================================================ */
+
+// ---------- CONFIGURACIÓN DE LA NUBE (Supabase) ----------
+// Pega aquí los datos de TU proyecto (mira el archivo INSTRUCCIONES-NUBE.md).
+// Mientras estén vacíos, las fotos se guardan solo en este dispositivo.
+const SUPABASE_URL    = '';   // ejemplo: 'https://abcdefgh.supabase.co'
+const SUPABASE_KEY    = '';   // la clave pública (anon / publishable)
+const SUPABASE_BUCKET = 'fotos';
+// ----------------------------------------------------------
+
+const photoInput  = document.getElementById('photo-input');
+const galleryGrid = document.getElementById('gallery-grid');
+const galleryNote = document.getElementById('gallery-note');
+const lightbox    = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightbox-img');
+
+const tulipMask = `<svg class="absolute -top-3 left-1/2 -translate-x-1/2 z-10 divider-tulip" width="30" height="36" viewBox="0 0 100 120">
+    <path d="M50 2C30 2 20 20 20 37c0 15 10 24 30 46 20-22 30-31 30-46C80 20 70 2 50 2Z" fill="#ff2ec4"/>
+  </svg>`;
+
+const PHOTO_DB    = 'modoAmorFotos';
+const PHOTO_STORE = 'fotos';
+// Fotos de ustedes que vienen con la página (carpeta "fotos"). 'pos' ajusta qué parte se ve en el marco.
+const MOMENTOS = [
+  { src:'fotos/momento1.jpg', pos:'50% 45%' },
+  { src:'fotos/momento2.jpg', pos:'50% 78%' },
+  { src:'fotos/momento3.jpg', pos:'50% 40%' },
+  { src:'fotos/momento4.jpg', pos:'50% 45%' },
+  { src:'fotos/momento5.jpg', pos:'50% 50%' },
+  { src:'fotos/momento6.jpg', pos:'50% 30%' }
+];
+
+// Imágenes que vienen con la página (carpeta "stickers"): siempre aparecen en la galería,
+// en cualquier dispositivo, sin necesidad de la nube. Agrega más nombres si quieres.
+const FIXED_PHOTOS = [
+  'stickers/sticker1.png', 'stickers/sticker2.png', 'stickers/sticker3.png',
+  'stickers/sticker4.png', 'stickers/sticker5.png', 'stickers/sticker6.png'
+];
+const MIN_SLOTS   = 4;      // marcos vacíos mientras hay pocas fotos
+const MAX_SIDE    = 1600;   // las fotos se reducen a este tamaño para ahorrar espacio
+
+const cloudWanted = !!(SUPABASE_URL && SUPABASE_KEY);
+const sb = (cloudWanted && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth:{ persistSession:false, autoRefreshToken:false } })
+  : null;
+const bucket = sb ? sb.storage.from(SUPABASE_BUCKET) : null;
+
+const NOTE_CLOUD = 'Sube fotos de sus momentos — se guardan en la nube y se ven en todos sus dispositivos.';
+const NOTE_LOCAL = 'Sube fotos de sus momentos — se guardan solas en este dispositivo.';
+const NOTE_MEM   = 'Este navegador no permite guardar fotos: se verán solo mientras la página esté abierta.';
+
+let backend  = 'memory';   // 'cloud' | 'local' | 'memory'
+let localDB  = null;       // copia local en el navegador (respaldo)
+let photos   = [];         // { id, url, kind:'cloud'|'local'|'mem' }
+let memoryId = 0;
+let noteTimer = null;
+
+function idleNote(){ return backend === 'cloud' ? NOTE_CLOUD : backend === 'local' ? NOTE_LOCAL : NOTE_MEM; }
+function showNote(text, revert){
+  clearTimeout(noteTimer);
+  galleryNote.textContent = text;
+  if(revert) noteTimer = setTimeout(()=>{ galleryNote.textContent = idleNote(); }, 6000);
+}
+function errText(err){ return String((err && err.message) || err || 'error desconocido'); }
+
+/* ---------- Copia local en el navegador (IndexedDB) ---------- */
+function openPhotoDB(){
+  return new Promise((resolve, reject)=>{
+    if(!window.indexedDB){ reject(new Error('sin IndexedDB')); return; }
+    const req = indexedDB.open(PHOTO_DB, 1);
+    req.onupgradeneeded = ()=> req.result.createObjectStore(PHOTO_STORE, { keyPath:'id', autoIncrement:true });
+    req.onsuccess = ()=> resolve(req.result);
+    req.onerror   = ()=> reject(req.error);
+  });
+}
+function dbGetAll(){
+  return new Promise((resolve, reject)=>{
+    const req = localDB.transaction(PHOTO_STORE).objectStore(PHOTO_STORE).getAll();
+    req.onsuccess = ()=> resolve(req.result);
+    req.onerror   = ()=> reject(req.error);
+  });
+}
+function dbAdd(blob){
+  return new Promise((resolve, reject)=>{
+    const tx = localDB.transaction(PHOTO_STORE, 'readwrite');
+    let key;
+    const req = tx.objectStore(PHOTO_STORE).add({ blob, ts: Date.now() });
+    req.onsuccess = ()=>{ key = req.result; };
+    tx.oncomplete = ()=> resolve(key);
+    tx.onerror = tx.onabort = ()=> reject(tx.error);
+  });
+}
+function dbDelete(id){
+  return new Promise((resolve, reject)=>{
+    const tx = localDB.transaction(PHOTO_STORE, 'readwrite');
+    tx.objectStore(PHOTO_STORE).delete(id);
+    tx.oncomplete = ()=> resolve();
+    tx.onerror = tx.onabort = ()=> reject(tx.error);
+  });
+}
+async function localPhotos(){
+  if(!localDB) return [];
+  const rows = await dbGetAll();
+  return rows.sort((a, b) => a.id - b.id)
+             .map(r => ({ id: r.id, url: URL.createObjectURL(r.blob), kind:'local' }));
+}
+
+/* ---------- Nube (Supabase Storage) ---------- */
+function publicUrl(name){ return bucket.getPublicUrl(name).data.publicUrl; }
+
+async function cloudList(){
+  const { data, error } = await bucket.list('', { limit: 1000, sortBy: { column:'created_at', order:'asc' } });
+  if(error) throw error;
+  return (data || [])
+    .filter(f => f.name && !f.name.startsWith('.') && f.id !== null)
+    .map(f => ({ id: f.name, url: publicUrl(f.name), kind:'cloud' }));
+}
+async function cloudAdd(blob){
+  const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
+  const { error } = await bucket.upload(name, blob, { contentType:'image/jpeg', cacheControl:'31536000' });
+  if(error) throw error;
+  return { id: name, url: publicUrl(name), kind:'cloud' };
+}
+async function cloudRemove(name){
+  const { data, error } = await bucket.remove([name]);
+  if(error) throw error;
+  if(!data || !data.length) throw new Error('el servidor no permitió borrarla');
+}
+// fotos que quedaron guardadas solo en este dispositivo (p. ej. sin internet) → subirlas a la nube
+async function migrateLocalToCloud(){
+  if(!localDB) return 0;
+  const rows = (await dbGetAll()).sort((a, b) => a.id - b.id);
+  for(const r of rows){ await cloudAdd(r.blob); await dbDelete(r.id); }
+  return rows.length;
+}
+
+/* ---------- Reducir la foto antes de guardarla ---------- */
+function compressImage(file){
+  return new Promise((resolve)=>{
+    const src = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = ()=>{
+      const scale = Math.min(1, MAX_SIDE / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      const g = c.getContext('2d');
+      g.fillStyle = '#fff';                       // fondo blanco por si es un PNG transparente
+      g.fillRect(0, 0, w, h);
+      g.drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(src);
+      c.toBlob(b => resolve(b), 'image/jpeg', 0.85);
+    };
+    img.onerror = ()=>{ URL.revokeObjectURL(src); resolve(null); };  // formato que el navegador no puede leer
+    img.src = src;
+  });
+}
+
+/* ---------- Dibujar la galería ---------- */
+function openPhoto(url){
+  lightboxImg.src = url;
+  lightbox.classList.remove('hidden');
+  lightbox.classList.add('flex');
+}
+
+function makePhotoCard(ph){
+  const card = document.createElement('div');
+  card.className = 'frame-card glass rounded-2xl p-2 relative cursor-pointer overflow-hidden';
+  card.innerHTML = tulipMask;
+
+  const img = document.createElement('img');
+  img.src = ph.url;
+  img.alt = 'Recuerdo';
+  img.loading = 'lazy';
+  img.decoding = 'async';
+  img.className = 'w-full h-40 sm:h-48 object-cover rounded-xl';
+  img.addEventListener('click', ()=> openPhoto(ph.url));
+
+  const del = document.createElement('button');
+  del.type = 'button';
+  del.innerHTML = '&times;';
+  del.setAttribute('aria-label', 'Borrar este recuerdo');
+  del.className = 'absolute top-3 right-3 z-20 w-6 h-6 rounded-full bg-black/60 text-white text-sm leading-none hover:bg-pink-500 transition';
+  del.addEventListener('click', async (e)=>{
+    e.stopPropagation();
+    if(!confirm('¿Borrar este recuerdo para siempre?')) return;
+    try{
+      if(ph.kind === 'cloud') await cloudRemove(ph.id);
+      else if(ph.kind === 'local' && localDB) await dbDelete(ph.id);
+    }catch(err){
+      console.error(err);
+      showNote('No se pudo borrar: ' + errText(err), true);
+      return;
+    }
+    if(ph.kind !== 'cloud') URL.revokeObjectURL(ph.url);
+    photos = photos.filter(p => p !== ph);
+    renderGallery();
+  });
+
+  card.append(img, del);
+  return card;
+}
+
+function makeMomentoCard(m){
+  const card = document.createElement('div');
+  card.className = 'frame-card glass rounded-2xl p-2 relative cursor-pointer overflow-hidden';
+  card.innerHTML = tulipMask;
+  const img = document.createElement('img');
+  img.src = m.src;
+  img.alt = 'Recuerdo';
+  img.loading = 'lazy';
+  img.decoding = 'async';
+  img.className = 'w-full h-40 sm:h-48 object-cover rounded-xl';
+  img.style.objectPosition = m.pos || '50% 50%';
+  img.addEventListener('click', ()=> openPhoto(m.src));
+  img.addEventListener('error', ()=> card.remove());
+  card.appendChild(img);
+  return card;
+}
+
+function makeFixedCard(url){
+  const card = document.createElement('div');
+  card.className = 'frame-card glass rounded-2xl p-2 relative cursor-pointer overflow-hidden';
+  card.innerHTML = tulipMask;
+
+  const img = document.createElement('img');
+  img.src = url;
+  img.alt = 'Recuerdo';
+  img.loading = 'lazy';
+  img.decoding = 'async';
+  // contain: se ve el dibujo completo (son stickers recortados), sin cortarlo
+  img.className = 'w-full h-40 sm:h-48 object-contain rounded-xl p-2';
+  img.addEventListener('click', ()=> openPhoto(url));
+  img.addEventListener('error', ()=> card.remove());   // si falta el archivo, no deja un marco roto
+  card.appendChild(img);
+  return card;
+}
+
+function renderGallery(){
+  galleryGrid.innerHTML = '';
+  MOMENTOS.forEach(m => galleryGrid.appendChild(makeMomentoCard(m)));                 // sus fotos
+  FIXED_PHOTOS.forEach(url => galleryGrid.appendChild(makeFixedCard(url)));          // las que vienen con la página
+  [...photos].reverse().forEach(ph => galleryGrid.appendChild(makePhotoCard(ph)));   // las subidas: la más nueva primero
+  for(let i = photos.length + MOMENTOS.length + FIXED_PHOTOS.length; i < MIN_SLOTS; i++){              // marcos vacíos
+    const slot = document.createElement('div');
+    slot.className = 'glass rounded-2xl p-2 relative overflow-hidden flex items-center justify-center h-40 sm:h-48';
+    slot.innerHTML = `${tulipMask}<span class="text-white/20 text-[11px] tracking-widest">RECUERDO ${i+1}</span>`;
+    galleryGrid.appendChild(slot);
+  }
+}
+
+/* ---------- Subir fotos: se guardan automáticamente ---------- */
+photoInput.addEventListener('change', async (e)=>{
+  const files = [...e.target.files].filter(f => f.type.startsWith('image/'));
+  e.target.value = '';                             // permite volver a elegir la misma foto
+  if(!files.length) return;
+
+  showNote('Guardando…');
+  let saved = 0, offline = 0, unsaved = 0, unreadable = 0, lastErr = '';
+
+  for(const file of files){
+    const blob = await compressImage(file);
+    if(!blob){ unreadable++; continue; }
+
+    let ph = null;
+    if(backend === 'cloud'){
+      try{ ph = await cloudAdd(blob); saved++; }
+      catch(err){ console.error(err); lastErr = errText(err); }
+    }
+    if(!ph && localDB){                            // sin nube (o sin internet): queda en este dispositivo
+      try{
+        const id = await dbAdd(blob);
+        ph = { id, url: URL.createObjectURL(blob), kind:'local' };
+        if(backend === 'cloud') offline++; else saved++;
+      }catch(_){}
+    }
+    if(!ph){
+      ph = { id: 'mem' + (++memoryId), url: URL.createObjectURL(blob), kind:'mem' };
+      unsaved++;
+    }
+    photos.push(ph);
+    renderGallery();
+  }
+
+  if(unsaved)         showNote('No se pudo guardar' + (lastErr ? ` (${lastErr})` : '') + '. La foto se verá solo mientras la página esté abierta.', true);
+  else if(offline)    showNote(`Sin conexión con la nube (${lastErr}). Se guardó en este dispositivo y se subirá sola la próxima vez que abras la página.`, true);
+  else if(unreadable) showNote(`✓ ${saved} guardada(s). ${unreadable} no se pudo leer (prueba con JPG o PNG).`, true);
+  else                showNote(saved === 1 ? '✓ Foto guardada' : `✓ ${saved} fotos guardadas`, true);
+});
+
+/* ---------- Al abrir la página: recuperar las fotos ---------- */
+(async function initGallery(){
+  try{ localDB = await openPhotoDB(); }catch(_){ localDB = null; }
+
+  if(sb){
+    backend = 'cloud';
+    showNote('Conectando con la nube…');
+    try{
+      const moved = await migrateLocalToCloud();
+      photos = await cloudList();
+      showNote(moved ? `✓ ${moved} foto(s) que estaban solo en este dispositivo ya están en la nube.` : NOTE_CLOUD, !!moved);
+    }catch(err){
+      console.error(err);
+      photos = await localPhotos().catch(()=>[]);
+      showNote(`No se pudo conectar con la nube (${errText(err)}). Se muestran solo las fotos de este dispositivo.`);
+    }
+  } else {
+    backend = localDB ? 'local' : 'memory';
+    photos = await localPhotos().catch(()=>[]);
+    showNote(cloudWanted ? 'No se pudo cargar la conexión con la nube; se usa solo este dispositivo.' : idleNote());
+  }
+  renderGallery();
+})();
+
+// al volver a la pestaña, se traen las fotos nuevas que la otra persona haya subido
+let refreshing = false;
+document.addEventListener('visibilitychange', async ()=>{
+  if(document.visibilityState !== 'visible' || backend !== 'cloud' || refreshing) return;
+  refreshing = true;
+  try{
+    const remote = await cloudList();
+    photos = remote.concat(photos.filter(p => p.kind !== 'cloud'));
+    renderGallery();
+  }catch(_){}
+  refreshing = false;
+});
+
+document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+lightbox.addEventListener('click', (e)=>{ if(e.target === lightbox) closeLightbox(); });
+function closeLightbox(){ lightbox.classList.add('hidden'); lightbox.classList.remove('flex'); }
+
+/* ============================================================
+   5. POESÍA — efecto máquina de escribir (español y francés)
+   ============================================================ */
+const poemsEs = [
+  { title:'Frecuencia', text:
+`Entre dos señales que buscan sintonía,
+tu nombre es el pulso que enciende mi circuito.
+No hay distancia que apague esta corriente:
+somos dos luces que aprendieron a mirarse.` },
+
+  { title:'Jardín de neón', text:
+`Planté un tulipán hecho de luz
+en el lugar exacto donde pienso en ti.
+Florece de noche, cuando todo calla,
+y solo tu nombre sabe regarlo.` },
+
+  { title:'Código eterno', text:
+`Si algún día el mundo se apaga,
+que quede grabado en algún lugar:
+que entre tanto ruido y tanta prisa,
+elegí quedarme, una y otra vez, en ti.` },
+
+  { title:'Tú', text:
+`Eres ese pensamiento
+que aparece sin avisar,
+la sonrisa que nace sola
+cuando te vuelvo a recordar.
+Si pudiera elegir un lugar
+donde quedarme para siempre,
+sería justo entre tus brazos,
+mirándote eternamente.` },
+
+  { title:'Mi lugar favorito', text:
+`No sé qué tiene tu mirada,
+pero cuando me miras así,
+el mundo deja de existir
+y solo quedamos tú y yo.
+Quizás mi lugar favorito
+nunca fue un sitio,
+sino el espacio que existe
+cuando estoy contigo.` },
+
+  { title:'Quédate', text:
+`Quédate cuando llegue la noche,
+cuando el silencio nos abrace,
+quédate cuando no tenga palabras
+y mi corazón sea quien hable.
+Quédate no por promesas,
+sino porque quieras estar;
+yo te daré mil razones
+para que no quieras marchar.` },
+
+  { title:'Si supieras', text:
+`Si supieras cuántas veces
+te encuentro en mis pensamientos,
+cuántas noches pronuncio tu nombre
+sin decirlo en voz alta.
+Si supieras cuánto te quiero,
+entenderías por qué mi corazón
+siempre encuentra el camino
+de regreso hacia ti.` },
+
+  { title:'Contigo', text:
+`Contigo quiero los días sencillos,
+los cafés de madrugada,
+las risas sin motivo
+y las miradas prolongadas.
+Quiero caminar a tu lado
+sin saber dónde llegar,
+porque mientras sea contigo,
+cualquier lugar será hogar.` },
+
+  { title:'Mi casualidad favorita', text:
+`Llegaste sin buscarte,
+sin saber cuánto te esperaba.
+Y de repente tu sonrisa
+se convirtió en mi esperanza.
+De todas las casualidades
+que pudo regalarme la vida,
+tú eres, sin ninguna duda,
+mi favorita.` },
+
+  { title:'Tus ojos', text:
+`Tus ojos tienen algo
+que no sé explicar,
+un pequeño universo
+donde me quiero quedar.
+Y si alguna vez me pierdo,
+no vengas a buscarme:
+solo vuelve a mirarme
+y sabré encontrarte.` },
+
+  { title:'Te elegiría', text:
+`Te elegiría en otra vida,
+en otro tiempo y otro lugar.
+Te reconocería entre millones
+aunque tuviera que empezar de cero.
+Porque hay personas que llegan
+y simplemente se sienten conocidas,
+como si el corazón supiera
+lo que la vida todavía no explica.` },
+
+  { title:'Amarte', text:
+`Amarte no es solamente
+decirte cuánto te quiero.
+Es pensarte en silencio,
+cuidarte incluso de lejos,
+alegrarme con tus alegrías
+y abrazarte en tus tristezas.
+Es querer compartir contigo
+hasta los días más pequeños.` },
+
+  { title:'Eres tú', text:
+`Cuando imagino el futuro,
+curiosamente apareces tú.
+En mis planes, en mis sueños,
+en cada pequeño “algún día”.
+Y quizás eso sea amor:
+imaginar tantos caminos
+y querer recorrerlos
+solamente contigo.` },
+
+  { title:'Antes de conocerte', text:
+`Antes de conocerte
+yo no sabía que faltaba algo.
+Entonces llegaste tú
+y todo tuvo sentido.
+Ahora entiendo que hay personas
+que no vienen a cambiar tu vida,
+sino a mostrarte
+lo hermosa que podía ser.` },
+
+  { title:'Siempre', text:
+`No te prometo días perfectos,
+porque ninguno de nosotros los tiene.
+Te prometo mi mano
+cuando el camino sea difícil,
+mi abrazo cuando tengas miedo
+y mi presencia cuando estés triste.
+Porque si alguna palabra quiero cumplir,
+es esta: siempre.` },
+
+  { title:'Tu abrazo', text:
+`Hay abrazos que duran segundos
+y otros que duran toda una vida.
+El tuyo pertenece a los segundos:
+porque cuando me abrazas,
+por un instante
+todo parece estar bien.` },
+
+  { title:'Amor mío', text:
+`Amor mío,
+si alguna vez dudas de mí,
+mira cómo te miro.
+Ahí encontrarás las palabras
+que mi boca no sabe decir.
+Porque hay sentimientos tan grandes
+que solamente pueden explicarse
+con la forma en que te miro.` },
+
+  { title:'Donde estés', text:
+`No importa dónde estés,
+siempre habrá una parte de mí
+que estará contigo.
+En una canción,
+en una fotografía,
+en una tarde de lluvia
+o en una estrella lejana.
+Porque cuando amas de verdad,
+la distancia nunca borra la presencia.` },
+
+  { title:'Tú y yo', text:
+`Tú y yo,
+sin promesas exageradas,
+sin historias perfectas,
+solo dos corazones
+aprendiendo a quererse.
+Y si la vida nos permite elegir,
+yo volvería a elegirte
+una y otra vez.` },
+
+  { title:'La noche', text:
+`Cuando la noche se queda en silencio
+y las estrellas comienzan a aparecer,
+pienso en ti.
+Y me pregunto cómo puede caber
+tanto amor en un solo corazón.
+Entonces sonrío,
+porque sé exactamente
+quién ocupa todo ese espacio.` },
+
+  { title:'Mi deseo', text:
+`No quiero riquezas,
+ni grandes tesoros.
+Mi deseo es más sencillo:
+despertar algún día a tu lado,
+mirarte medio dormido
+y pensar que tuve suerte
+de encontrar mi hogar
+en una persona.` },
+
+  { title:'Si pudiera', text:
+`Si pudiera detener el tiempo,
+detendría aquel momento
+en que me miraste
+y mi corazón entendió algo
+que mi razón todavía ignoraba.
+Desde entonces comprendí
+que algunas miradas
+son comienzos disfrazados.` },
+
+  { title:'Para siempre contigo', text:
+`Si me preguntas qué quiero,
+no necesito pensarlo.
+Quiero tus risas,
+tus abrazos, tus historias,
+tus días buenos y tus días difíciles.
+Quiero conocerte una y otra vez
+en cada etapa de la vida.
+Y si existe un “para siempre”,
+quiero descubrirlo contigo.` }
+];
+
+const poemsFr = [
+  { title:'Mon amour', text:
+`Tu es la lumière
+qui traverse mes nuits,
+le sourire qui reste
+quand tout est fini.
+Et si mon cœur pouvait parler,
+il ne dirait qu'une chose :
+je t'aime.` },
+
+  { title:'À tes côtés', text:
+`Je ne veux pas un amour parfait,
+je veux un amour sincère.
+Quelqu'un qui reste près de moi
+quand la vie devient difficile.
+Et si je pouvais choisir,
+je choisirais encore
+de marcher à tes côtés.` },
+
+  { title:'Tes yeux', text:
+`Dans tes yeux,
+j'ai trouvé un ciel
+où je pourrais me perdre
+sans jamais vouloir revenir.
+Ton regard est devenu
+mon endroit préféré.` },
+
+  { title:'Reste', text:
+`Reste encore un peu,
+laisse-moi profiter de ton sourire.
+Laisse-moi tenir ta main
+comme si le temps pouvait s'arrêter.
+Car chaque seconde avec toi
+est une seconde
+que je voudrais garder pour toujours.` },
+
+  { title:'Je te choisirais', text:
+`Dans mille vies différentes,
+dans mille villes inconnues,
+parmi des milliers de visages,
+je chercherais encore le tien.
+Et même sans te connaître,
+mon cœur saurait
+qu'il t'attendait.` },
+
+  { title:'Mon chez-moi', text:
+`Je pensais que “chez moi”
+était un endroit.
+Puis je t'ai rencontré.
+Maintenant, je sais que parfois
+un foyer peut être
+un sourire, une voix,
+ou simplement
+les bras de quelqu'un qu'on aime.` },
+
+  { title:'Pour toujours', text:
+`Je ne te promets pas
+un ciel toujours sans nuages.
+Je te promets ma main
+quand viendra la pluie,
+mon épaule quand tu seras fatigué,
+et mon cœur
+aussi longtemps qu'il battra.` },
+
+  { title:'Toi', text:
+`Toi,
+tu es cette pensée
+qui arrive sans prévenir.
+Cette personne qui transforme
+une journée ordinaire
+en un souvenir magnifique.
+Toi, simplement toi,
+et cela me suffit.` },
+
+  { title:'Notre histoire', text:
+`Je ne sais pas
+où notre histoire nous mènera.
+Mais je sais une chose :
+je veux découvrir chaque page
+avec toi.
+Et si notre histoire était un livre,
+je ne voudrais jamais
+arriver à la dernière page.` },
+
+  { title:"Je t'aime", text:
+`Je t'aime dans le silence,
+je t'aime dans les rires,
+je t'aime dans les petits moments
+que personne ne remarque.
+Je t'aime aujourd'hui,
+je t'aimerai demain,
+et si mon cœur le permet,
+je t'aimerai encore après demain.` }
+];
+
+const poems = [
+  ...poemsEs.map(p => ({ ...p, lang:'es' })),
+  ...poemsFr.map(p => ({ ...p, lang:'fr' }))
+];
+const poemLangs = [
+  { code:'es', label:'Español' },
+  { code:'fr', label:'Français' }
+];
+let currentLang = 'es';
+
+const poemLangBox = document.getElementById('poem-langs');
+const poemButtons = document.getElementById('poem-buttons');
+const poemDisplay = document.getElementById('poem-display');
+let typeTimer = null;
+
+function typePoem(poem){
+  clearInterval(typeTimer);
+  const text = poem.text;
+  poemDisplay.lang = poem.lang;
+  poemDisplay.textContent = '';
+  let i = 0;
+  typeTimer = setInterval(()=>{
+    poemDisplay.textContent += text[i];
+    i++;
+    if(i >= text.length) clearInterval(typeTimer);
+  }, 32);
+}
+
+function renderPoemButtons(){
+  poemButtons.innerHTML = '';
+  poems.filter(p => p.lang === currentLang).forEach(p=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = p.title;
+    btn.className = 'px-4 py-1.5 rounded-full text-xs tracking-widest font-display border border-pink-400/30 text-pink-100/70 hover:text-white hover:border-pink-300 transition';
+    btn.addEventListener('click', ()=> typePoem(p));
+    poemButtons.appendChild(btn);
+  });
+}
+
+function renderLangTabs(){
+  poemLangBox.innerHTML = '';
+  poemLangs.forEach(l=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = l.label;
+    const active = l.code === currentLang;
+    btn.className = 'px-5 py-1.5 rounded-full text-[11px] tracking-widest font-display border transition ' +
+      (active ? 'border-pink-300 text-white bg-pink-500/20' : 'border-pink-400/30 text-pink-100/60 hover:text-white');
+    btn.addEventListener('click', ()=>{
+      currentLang = l.code;
+      renderLangTabs();
+      renderPoemButtons();
+      typePoem(poems.find(p => p.lang === l.code));
+    });
+    poemLangBox.appendChild(btn);
+  });
+}
+
+renderLangTabs();
+renderPoemButtons();
+typePoem(poems[0]);
+
+/* ============================================================
+   6. TEST DE COMPATIBILIDAD
+   ============================================================ */
+const quizQuestions = [
+  { q:'¿Cuál es nuestro plan de cita ideal?', options:['Noche de películas','Cena con velas','Aventura al aire libre','Quedarnos charlando hasta tarde'] },
+  { q:'¿Qué valoras más en pareja?', options:['Complicidad','Comunicación honesta','Apoyo mutuo','Sentido del humor'] },
+  { q:'¿Cómo prefieres demostrar cariño?', options:['Palabras','Detalles pequeños','Tiempo de calidad','Contacto físico'] },
+];
+let quizIndex = 0;
+let quizAnswers = [];
+const quizBody = document.getElementById('quiz-body');
+
+function renderQuiz(){
+  if(quizIndex >= quizQuestions.length){
+    quizBody.innerHTML = `<p class="text-sm text-pink-100/80 leading-relaxed">
+      Compatibilidad calculada: <span class="text-white font-display">98%</span> ♥<br>
+      <span class="text-pink-100/50 text-xs">Basado en: ${quizAnswers.join(' · ')}</span>
+    </p>
+    <button id="quiz-restart" class="mt-4 text-xs underline text-pink-200/70 hover:text-white">repetir test</button>`;
+    document.getElementById('quiz-restart').addEventListener('click', ()=>{
+      quizIndex = 0; quizAnswers = []; renderQuiz();
+    });
+    return;
+  }
+  const item = quizQuestions[quizIndex];
+  quizBody.innerHTML = `
+    <p class="text-sm text-pink-50 mb-3">${item.q}</p>
+    <div class="flex flex-col gap-2">
+      ${item.options.map(o=>`<button class="quiz-opt tulip-input text-left px-4 py-2 text-xs text-pink-100/80 hover:text-white">${o}</button>`).join('')}
+    </div>`;
+  quizBody.querySelectorAll('.quiz-opt').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      quizAnswers.push(btn.textContent);
+      quizIndex++;
+      renderQuiz();
+    });
+  });
+}
+renderQuiz();
+
+/* ============================================================
+   7. RUEDA DE PREGUNTAS (editable, máximo 50)
+   ============================================================ */
+const WHEEL_MAX = 50;          // límite de preguntas
+const WHEEL_MIN = 2;           // mínimo para poder girar
+const WHEEL_MAX_CHARS = 90;    // largo máximo de cada pregunta
+const WHEEL_STORAGE_KEY = 'modoAmorRueda';
+
+// Preguntas iniciales (puedes cambiarlas aquí o desde el botón "editar preguntas")
+const defaultWheelItems = [
+  '¿Cuál es tu recuerdo favorito de nosotros?',
+  '¿Qué fue lo primero que pensaste al verme?',
+  '¿Qué es lo que más te gusta de mi forma de ser?',
+  '¿A dónde te gustaría viajar juntos?',
+  '¿Qué canción te recuerda a mí?',
+  '¿Qué gesto mío te enamora más?',
+  '¿Cómo imaginas nuestra cita perfecta?',
+  '¿Qué sueño te gustaría cumplir juntos?',
+  '¿Cuál ha sido nuestro momento más divertido?',
+  '¿Qué es lo que más risa te da de mí?',
+  '¿Qué apodo cariñoso te gustaría que te dijera más seguido?',
+  '¿Cuál fue el mejor detalle que has recibido de mí?',
+  '¿Qué película o serie crees que nos representa?',
+  '¿Qué te gustaría que hiciéramos más seguido?',
+  '¿Qué crees que podemos mejorar juntos?',
+  '¿Qué es lo más romántico que alguien ha hecho por ti?',
+  '¿Cómo te imaginas nuestra vida en cinco años?',
+  '¿Qué comida te gustaría que cocináramos juntos?',
+  '¿Cuál es tu lugar favorito para estar conmigo?',
+  '¿Qué es lo que más admiras de mí?',
+  '¿Qué te gustaría que supiera de ti y aún no sé?',
+  '¿En qué momento supiste que me querías?',
+  '¿Qué plan improvisado harías conmigo hoy?',
+  '¿Qué tradición nueva te gustaría que creáramos?',
+  '¿Qué pequeño detalle mío nunca olvidas?',
+  'Reto: dime tres cosas que te encantan de mí.',
+  'Reto: dame un abrazo de 20 segundos sin hablar.',
+  'Reto: cuéntame algo que nunca te he dicho.',
+  'Reto: baila conmigo una canción completa.',
+  'Reto: escríbeme una mini carta de tres líneas.'
+];
+
+function loadWheelItems(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(WHEEL_STORAGE_KEY));
+    if(Array.isArray(saved)){
+      const clean = saved
+        .filter(s => typeof s === 'string' && s.trim())
+        .map(s => s.trim().slice(0, WHEEL_MAX_CHARS))
+        .slice(0, WHEEL_MAX);
+      if(clean.length >= WHEEL_MIN) return clean;
+    }
+  }catch(_){ /* sin almacenamiento: usamos las de fábrica */ }
+  return [...defaultWheelItems];
+}
+
+function saveWheelItems(){
+  try{ localStorage.setItem(WHEEL_STORAGE_KEY, JSON.stringify(wheelItems)); }catch(_){}
+}
+
+let wheelItems = loadWheelItems();
+
+const wheelWrap    = document.getElementById('wheel-wrap');
+const spinBtn      = document.getElementById('spin-btn');
+const wheelResult  = document.getElementById('wheel-result');
+const editWheelBtn = document.getElementById('edit-wheel-btn');
+const wheelEditor  = document.getElementById('wheel-editor');
+const editorList   = document.getElementById('editor-list');
+const editorNew    = document.getElementById('editor-new');
+const editorAdd    = document.getElementById('editor-add');
+const editorCount  = document.getElementById('editor-count');
+const editorClose  = document.getElementById('editor-close');
+const editorReset  = document.getElementById('editor-reset');
+let wheelRotation = 0;
+let spinning = false;
+
+function buildWheel(){
+  const n = wheelItems.length;
+  const slice = 360 / n;
+  const colors = ['#ff2ec4', '#b026ff'];
+  const parts = wheelItems.map((_, i)=>{
+    // con cantidad impar, la última porción usa un tercer color para no repetir la primera
+    const color = (n % 2 === 1 && i === n - 1) ? '#ff8fd8' : colors[i % 2];
+    return `${color} ${i * slice}deg ${(i + 1) * slice}deg`;
+  });
+  wheelWrap.style.background = `conic-gradient(${parts.join(', ')})`;
+  wheelWrap.style.borderRadius = '50%';
+  wheelWrap.style.boxShadow = '0 0 30px rgba(255,46,196,.5), inset 0 0 20px rgba(0,0,0,.35)';
+  wheelWrap.style.border = '2px solid rgba(255,255,255,.15)';
+}
+buildWheel();
+
+spinBtn.addEventListener('click', ()=>{
+  if(spinning || wheelItems.length < WHEEL_MIN) return;
+  spinning = true;
+  spinBtn.disabled = true;
+
+  const n = wheelItems.length;
+  const slice = 360 / n;
+  const chosen = Math.floor(Math.random() * n);
+  const prize = wheelItems[chosen];             // la guardamos por si se edita la lista mientras gira
+  const center = chosen * slice + slice / 2;    // centro de la porción elegida
+  const jitter = (Math.random() - .5) * slice * .6; // que no caiga siempre justo en el centro
+  const currentTurn = wheelRotation - (wheelRotation % 360);
+
+  // la porción elegida queda bajo el indicador (arriba)
+  wheelRotation = currentTurn + 5 * 360 + (360 - center) + jitter;
+  wheelWrap.style.transform = `rotate(${wheelRotation}deg)`;
+  wheelResult.textContent = '';
+
+  setTimeout(()=>{
+    wheelResult.textContent = '✦ ' + prize + ' ✦';
+    spinning = false;
+    spinBtn.disabled = false;
+  }, 4300);
+});
+
+/* ---------- Editor de preguntas ---------- */
+function afterWheelChange(){
+  saveWheelItems();
+  buildWheel();
+  renderEditor();
+  wheelResult.textContent = '';
+}
+
+function renderEditor(){
+  editorList.innerHTML = '';
+  wheelItems.forEach((text, idx)=>{
+    const row = document.createElement('div');
+    row.className = 'flex items-center gap-2';
+
+    const num = document.createElement('span');
+    num.className = 'w-6 text-right text-[10px] text-pink-200/40 shrink-0';
+    num.textContent = idx + 1;
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.maxLength = WHEEL_MAX_CHARS;
+    input.value = text;
+    input.setAttribute('aria-label', 'Pregunta ' + (idx + 1));
+    input.className = 'we-input flex-1 min-w-0 px-3 py-2 text-xs';
+    input.addEventListener('change', ()=>{
+      const v = input.value.trim();
+      if(!v){ input.value = wheelItems[idx]; return; }   // no se permiten vacías
+      wheelItems[idx] = v;
+      saveWheelItems();
+    });
+
+    const del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'we-del shrink-0';
+    del.innerHTML = '&times;';
+    del.setAttribute('aria-label', 'Borrar pregunta ' + (idx + 1));
+    del.disabled = wheelItems.length <= WHEEL_MIN;
+    del.addEventListener('click', ()=>{
+      wheelItems.splice(idx, 1);
+      afterWheelChange();
+    });
+
+    row.append(num, input, del);
+    editorList.appendChild(row);
+  });
+
+  const full = wheelItems.length >= WHEEL_MAX;
+  editorCount.textContent = `${wheelItems.length} / ${WHEEL_MAX} preguntas`;
+  editorNew.disabled = full;
+  editorAdd.disabled = full;
+  editorNew.placeholder = full ? `Llegaste al máximo de ${WHEEL_MAX}` : 'Escribe una pregunta nueva…';
+}
+
+function addWheelItem(){
+  const v = editorNew.value.trim();
+  if(!v || wheelItems.length >= WHEEL_MAX) return;
+  wheelItems.push(v.slice(0, WHEEL_MAX_CHARS));
+  editorNew.value = '';
+  afterWheelChange();
+  editorList.scrollTop = editorList.scrollHeight;
+  if(!editorNew.disabled) editorNew.focus();
+}
+
+function openEditor(){
+  renderEditor();
+  wheelEditor.classList.remove('hidden');
+  wheelEditor.classList.add('flex');
+  document.body.style.overflow = 'hidden';
+  editorNew.focus();
+}
+function closeEditor(){
+  wheelEditor.classList.add('hidden');
+  wheelEditor.classList.remove('flex');
+  document.body.style.overflow = '';
+}
+
+editWheelBtn.addEventListener('click', openEditor);
+editorClose.addEventListener('click', closeEditor);
+wheelEditor.addEventListener('click', (e)=>{ if(e.target === wheelEditor) closeEditor(); });
+editorAdd.addEventListener('click', addWheelItem);
+editorNew.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); addWheelItem(); } });
+editorReset.addEventListener('click', ()=>{
+  if(confirm('¿Volver a las preguntas originales? Se perderán tus cambios.')){
+    wheelItems = [...defaultWheelItems];
+    afterWheelChange();
+  }
+});
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){ closeEditor(); closeLightbox(); }
+});
+
+/* ============================================================
+   8. TRIVIA SECRETA (cartas volteables)
+   ============================================================ */
+const triviaCards = [
+  { q:'¿Dónde nos vimos por primera vez?' },
+  { q:'¿Cuál fue mi primera impresión de ti?' },
+  { q:'¿Qué canción nos representa?' },
+  { q:'¿Cuál es nuestro chiste interno favorito?' },
+];
+const triviaGrid = document.getElementById('trivia-grid');
+
+triviaCards.forEach((c, i)=>{
+  const wrap = document.createElement('div');
+  wrap.className = 'flip-card h-24 cursor-pointer';
+  wrap.innerHTML = `
+    <div class="flip-inner relative w-full h-full">
+      <div class="flip-front absolute inset-0 glass rounded-xl flex items-center justify-center">
+        <span class="font-display text-2xl neon-text">?</span>
+      </div>
+      <div class="flip-back absolute inset-0 rounded-xl flex items-center justify-center text-center px-2 text-[11px] text-pink-50"
+           style="background:linear-gradient(135deg, rgba(255,46,196,.25), rgba(176,38,255,.25)); border:1px solid rgba(255,143,216,.35);">
+        ${c.q}
+      </div>
+    </div>`;
+  wrap.addEventListener('click', ()=> wrap.classList.toggle('flipped'));
+  triviaGrid.appendChild(wrap);
+});
+
+/* ============================================================
+   9. STICKERS DECORATIVOS (posiciones aleatorias en los bordes)
+   ============================================================ */
+// Guarda tus imágenes dentro de la carpeta "stickers" y escribe aquí sus nombres.
+// Las que no existan se ignoran solas, así que puedes dejar la lista más larga.
+// Lo ideal: PNG con fondo transparente (recortadas) para que parezcan stickers reales.
+const STICKER_FOLDER = 'stickers/';
+const STICKER_FILES = [
+  'sticker1.png', 'sticker2.png', 'sticker3.png',
+  'sticker4.png', 'sticker5.png', 'sticker6.png'
+];
+
+const stickerLayer = document.getElementById('sticker-layer');
+let stickerUrls = null;   // imágenes que sí cargaron
+let stickersWidth = 0;
+
+const rand = (a, b) => a + Math.random() * (b - a);
+
+function shuffle(arr){
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function preloadStickers(){
+  return Promise.all(STICKER_FILES.map(file => new Promise(resolve => {
+    const img = new Image();
+    img.onload  = () => resolve(STICKER_FOLDER + file);
+    img.onerror = () => resolve(null);
+    img.src = STICKER_FOLDER + file;
+  }))).then(list => list.filter(Boolean));
+}
+
+function placeStickers(){
+  stickerLayer.innerHTML = '';
+  if(!stickerUrls || !stickerUrls.length) return;
+
+  const W = app.clientWidth;
+  const H = app.scrollHeight;
+  stickersWidth = W;
+
+  const mobile = W < 640;
+  const count = mobile ? 8 : 16;                       // cuántos stickers en total
+  const [minS, maxS] = mobile ? [44, 68] : [70, 118];  // tamaño en px
+  const slot = H / count;                              // repartimos a lo largo de toda la página
+  const startLeft = Math.random() < .5;
+  let pool = [];
+
+  for(let i = 0; i < count; i++){
+    if(!pool.length) pool = shuffle(stickerUrls);
+
+    const img = document.createElement('img');
+    img.src = pool.pop();
+    img.alt = '';
+    img.className = 'sticker';
+    img.draggable = false;
+
+    const size = rand(minS, maxS);
+    // alterna izquierda/derecha, con un poco de azar para que no se vea ordenado
+    const onLeft = ((i % 2 === 0) === startLeft) !== (Math.random() < .25);
+    // pegados al borde: pueden asomarse un poco fuera de la pantalla
+    const inset = rand(-size * .3, mobile ? W * .04 : W * .08);
+    const top = i * slot + rand(.08, .7) * slot;
+
+    img.style.setProperty('--s', size + 'px');
+    img.style.setProperty('--r', rand(-18, 18) + 'deg');
+    img.style.setProperty('--d', (i * 0.12) + 's');
+    img.style.top = top + 'px';
+    img.style[onLeft ? 'left' : 'right'] = inset + 'px';
+
+    stickerLayer.appendChild(img);
+  }
+}
+
+async function initStickers(){
+  if(stickerUrls === null) stickerUrls = await preloadStickers();
+  placeStickers();
+}
+
+// si cambia el ancho de la ventana, se reacomodan (no al hacer scroll en el celular)
+let stickerResizeTimer = null;
+window.addEventListener('resize', ()=>{
+  clearTimeout(stickerResizeTimer);
+  stickerResizeTimer = setTimeout(()=>{
+    if(stickerUrls && app.clientWidth !== stickersWidth) placeStickers();
+  }, 300);
+});
+</script>
+</body>
+</html>

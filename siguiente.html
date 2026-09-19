@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Universo Flores Amarillas</title>
+
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Caveat:wght@500;700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+  /* ---------- Universo (aparece al escribir la fecha correcta) ---------- */
+  #universo-wrap {
+    position: fixed; inset: 0; z-index: 40;
+    background: #05030c;
+    font-family: 'Quicksand', sans-serif;
+    -webkit-user-select: none; user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0; visibility: hidden;
+    transition: opacity 1.4s ease, visibility 1.4s ease;
+  }
+  #universo-wrap.visible { opacity: 1; visibility: visible; }
+  #universo-wrap canvas { display: block; touch-action: none; }
+
+  #titulo {
+    position: absolute; top: 30px; left: 0; right: 0;
+    text-align: center; pointer-events: none; z-index: 5;
+    font-family: 'Caveat', cursive;
+    font-size: clamp(1.8em, 5vw, 3em);
+    color: #ffe3f7;
+    text-shadow: 0 0 10px #ff5fd1, 0 0 22px #ff00c8;
+    letter-spacing: 1px;
+  }
+  #ayuda {
+    position: absolute; bottom: 16px; left: 0; right: 0;
+    text-align: center; z-index: 5; pointer-events: none;
+    color: rgba(255,243,196,.55); font-size: .8em;
+    transition: opacity 1s ease;
+  }
+  #volver {
+    position: absolute; bottom: 14px; left: 16px; z-index: 6;
+    color: rgba(255,243,196,.4); font-size: .75em; text-decoration: none;
+    transition: color .2s ease;
+  }
+  #volver:hover { color: rgba(255,243,196,.9); }
+  #universo-error {
+    display: none; position: absolute; inset: 0; z-index: 7;
+    align-items: center; justify-content: center; text-align: center; padding: 24px;
+    font-family: 'Caveat', cursive; font-size: 1.6em; color: #fff3c4;
+  }
+  #universo-error.mostrar { display: flex; }
+</style>
+
+<!-- Three.js (se descarga solo cuando se abre el universo) -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<!-- ============ PUERTA DE LA FECHA ============ -->
+<div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <form id="date-form" class="login-card glass w-full max-w-sm rounded-3xl px-8 pt-16 pb-10 relative">
+
+    <!-- tulipán holográfico decorativo -->
+    <svg class="absolute -top-2 left-1/2 -translate-x-1/2" width="72" height="86" viewBox="0 0 100 120" fill="none">
+      <defs>
+        <linearGradient id="tulipGrad" x1="0" y1="0" x2="100" y2="120" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#ff2ec4"/>
+          <stop offset="1" stop-color="#b026ff"/>
+        </linearGradient>
+      </defs>
+      <path d="M50 2C30 2 20 20 20 37c0 15 10 24 30 46 20-22 30-31 30-46C80 20 70 2 50 2Z" stroke="url(#tulipGrad)" stroke-width="2.4" fill="rgba(255,46,196,.12)"/>
+      <path d="M50 83v33M50 96c-10-2-16-10-16-10M50 104c10-2 16-9 16-9" stroke="url(#tulipGrad)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+    </svg>
+
+    <h1 class="font-display text-center text-xl sm:text-2xl tracking-wide neon-text mb-1">PÁGINA SECRETA</h1>
+    <p class="text-center text-pink-200/70 text-xs tracking-[0.25em] mb-8">LA&nbsp;FECHA&nbsp;ABRE&nbsp;LA&nbsp;PUERTA</p>
+
+    <label class="block text-xs uppercase tracking-widest text-pink-200/70 mb-1.5" for="fecha">Fecha</label>
+    <input id="fecha" type="text" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="dd/mm/aaaa"
+      class="tulip-input w-full px-4 py-3 mb-2 text-sm text-center tracking-widest text-white placeholder:text-white/30" required>
+
+    <p id="date-error" class="text-xs text-pink-300 min-h-[1rem] mb-2 text-center"></p>
+
+    <button type="submit" class="heart-btn w-full mt-4 py-3 rounded-full font-display text-sm tracking-widest text-white">
+      ♥ ABRIR
+    </button>
+
+    <p class="text-center text-[11px] text-white/30 mt-5">
+      <a href="index.html" class="underline hover:text-white/70">← volver al inicio</a>
+    </p>
+  </form>
+</div>
+
+<!-- ============ UNIVERSO FLORES AMARILLAS ============ -->
+<div id="universo-wrap" aria-hidden="true">
+  <canvas id="universo"></canvas>
+  <div id="titulo">Feliz Mes Mi amor 🌼</div>
+  <div id="ayuda">Arrastra para mirar alrededor · rueda / pellizco para acercar</div>
+  <a id="volver" href="index.html">← inicio</a>
+  <div id="universo-error">No se pudo abrir el universo.<br>Revisa tu conexión a internet y vuelve a intentarlo ♥</div>
+</div>
+
+<!--
+  MÚSICA DE FONDO
+  Pon tu archivo de audio (mp3) en la carpeta "musica" y escribe su nombre
+  en el atributo src de abajo, por ejemplo: musica/nuestra-cancion.mp3
+  Si no hay archivo, simplemente no suena música.
+-->
+<audio id="musica" loop preload="none">
+  <source src="musica/nuestra-cancion.mp3" type="audio/mpeg">
+</audio>
+
+<script type="module">
+/* ============================================================
+   1. FECHA QUE ABRE LA PÁGINA — cámbiala aquí cuando quieras
+   ============================================================ */
+const FECHA_SECRETA = { dia: 13, mes: 2, anio: 2008 };
+
+const loginScreen  = document.getElementById('login-screen');
+const dateForm     = document.getElementById('date-form');
+const dateInput    = document.getElementById('fecha');
+const dateError    = document.getElementById('date-error');
+const universoWrap = document.getElementById('universo-wrap');
+const universoErr  = document.getElementById('universo-error');
+const ayuda        = document.getElementById('ayuda');
+const musica       = document.getElementById('musica');
+
+// Acepta 15/12/2023, 15-12-2023, 15.12.2023, 15/12/23 o 15122023
+function parseFecha(texto){
+  const m = texto.trim().match(/^(\d{1,2})\D*(\d{1,2})\D*(\d{4}|\d{2})$/);
+  if(!m) return null;
+  let anio = parseInt(m[3], 10);
+  if(m[3].length === 2) anio += 2000;
+  return { dia: parseInt(m[1], 10), mes: parseInt(m[2], 10), anio };
+}
+
+dateInput.addEventListener('input', ()=>{ dateError.textContent = ''; });
+
+dateForm.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const f = parseFecha(dateInput.value);
+  const ok = f && f.dia === FECHA_SECRETA.dia && f.mes === FECHA_SECRETA.mes && f.anio === FECHA_SECRETA.anio;
+
+  if(ok){
+    dateError.textContent = '';
+    loginScreen.classList.add('bloom-out');
+    setTimeout(()=>{ loginScreen.style.display = 'none'; }, 950);
+    abrirUniverso();
+  } else {
+    dateError.textContent = 'Esa no es la fecha que abre la puerta ♥';
+    dateForm.classList.remove('shake');
+    void dateForm.offsetWidth;          // reinicia la animación
+    dateForm.classList.add('shake');
+    dateInput.select();
+  }
+});
+
+/* ============================================================
+   2. PARTÍCULAS DE FONDO (solo detrás de la puerta de la fecha)
+   ============================================================ */
+const canvasFondo = document.getElementById('particles');
+const ctxFondo = canvasFondo.getContext('2d');
+let particulas = [];
+let fondoActivo = true;
+
+function ajustarFondo(){
+  canvasFondo.width = window.innerWidth;
+  canvasFondo.height = window.innerHeight;
+}
+ajustarFondo();
+window.addEventListener('resize', ajustarFondo);
+
+function crearParticulas(){
+  const count = window.innerWidth < 640 ? 45 : 90;
+  particulas = Array.from({length:count}, ()=>({
+    x: Math.random()*canvasFondo.width,
+    y: Math.random()*canvasFondo.height,
+    r: Math.random()*1.8 + .4,
+    vy: -(Math.random()*.35 + .08),
+    vx: (Math.random()-.5)*.15,
+    hue: Math.random() > .5 ? '255,46,196' : '176,38,255',
+    a: Math.random()*.5 + .2
+  }));
+}
+crearParticulas();
+
+function dibujarFondo(){
+  if(!fondoActivo) return;                       // al abrir el universo se detiene, para ahorrar batería
+  ctxFondo.clearRect(0,0,canvasFondo.width,canvasFondo.height);
+  particulas.forEach(p=>{
+    p.y += p.vy; p.x += p.vx;
+    if(p.y < -10) p.y = canvasFondo.height + 10;
+    if(p.x < -10) p.x = canvasFondo.width + 10;
+    if(p.x > canvasFondo.width+10) p.x = -10;
+    ctxFondo.beginPath();
+    ctxFondo.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    ctxFondo.fillStyle = `rgba(${p.hue},${p.a})`;
+    ctxFondo.shadowBlur = 8;
+    ctxFondo.shadowColor = `rgba(${p.hue},.8)`;
+    ctxFondo.fill();
+  });
+  requestAnimationFrame(dibujarFondo);
+}
+dibujarFondo();
+
+/* ============================================================
+   3. ABRIR EL UNIVERSO (al escribir la fecha correcta)
+   ============================================================ */
+let universoIniciado = false;
+
+async function abrirUniverso(){
+  universoWrap.classList.add('visible');
+  universoWrap.setAttribute('aria-hidden', 'false');
+  fondoActivo = false;
+  setTimeout(()=>{ ayuda.style.opacity = 0; }, 6000);
+
+  musica.volume = 0.5;
+  musica.play().catch(() => {});                 // si no hay archivo de música, simplemente no pasa nada
+
+  if(universoIniciado) return;
+  universoIniciado = true;
+  try{
+    const THREE = await import('three');
+    iniciarUniverso(THREE);
+  }catch(err){
+    console.error(err);
+    universoIniciado = false;
+    universoErr.classList.add('mostrar');
+  }
+}
+
+/* =========================================================================
+   CONFIGURA AQUÍ TU CONTENIDO
+   =======================================================================*/
+
+// Frases que van a flotar en el espacio (se ven en cursiva dorada)
+const FRASES = [
+  "Te quiero",
+  "Te amo",
+  "Eres mi persona favorita",
+  "Contigo todo brilla más",
+  "Gracias por estar ahí",
+  "Mi corazón es tuyo",
+  "Una amistad que no se apaga",
+  "Eres mi persona especial",
+  "Siempre serás mi favorita",
+  "Mi mundo eres tú",
+  "Quiero envejecer a tu lado",
+  "Eres mi lugar favorito",
+  "No hay universo sin ti",
+  "Mi casa eres tú",
+  "Eres mi persona, hoy y siempre",
+  "Contigo la vida sabe mejor",
+  "Eres el amor de mi vida",
+  "Cada día te quiero más",
+
+  "I love you",
+  "I adore you",
+  "You are my favorite person",
+  "With you everything shines brighter",
+  "Thank you for being here",
+  "My heart is yours",
+  "A love that never fades",
+  "You mean the world to me",
+  "Always and forever",
+  "You are my everything",
+  "I want to grow old with you",
+  "You are my favorite place",
+  "There's no universe without you",
+  "Home is wherever you are",
+  "You are my person, today and always",
+  "Life is better with you",
+  "You are the love of my life",
+  "I love you a little more every day",
+
+  "Je t'aime",
+  "Mon amour",
+  "Tu es mon univers",
+  "Avec toi tout est plus beau",
+  "Merci d'être là",
+  "Mon cœur est à toi",
+  "Un amour qui ne s'éteint jamais",
+  "Tu comptes plus que tout",
+  "Pour toujours et à jamais",
+  "Tu es tout pour moi",
+  "Je veux vieillir à tes côtés",
+  "Tu es mon endroit préféré",
+  "Il n'y a pas d'univers sans toi",
+  "Chez moi, c'est toi",
+  "Tu es mon amour, aujourd'hui et toujours",
+  "La vie est plus belle avec toi",
+  "Tu es l'amour de ma vie",
+  "Je t'aime un peu plus chaque jour",
+
+  "Ti amo",
+  "Amore mio",
+  "Sei il mio universo",
+  "Con te tutto è più bello",
+  "Grazie di esserci",
+  "Il mio cuore è tuo",
+  "Un amore che non si spegne mai",
+  "Per me conti più di tutto",
+  "Per sempre e per sempre",
+  "Sei tutto per me",
+  "Voglio invecchiare accanto a te",
+  "Sei il mio posto preferito",
+  "Non esiste universo senza te",
+  "Casa mia sei tu",
+  "Sei il mio amore, oggi e sempre",
+  "La vita è più bella con te",
+  "Sei l'amore della mia vita",
+  "Ti amo un po' di più ogni giorno",
+
+  "Feliz día de las flores amarillas",
+  "🌷 🌹 💛",
+];
+
+// Fotos flotantes. Pon tus archivos en la carpeta /img y agrégalos aquí.
+// Si dejas el arreglo vacío, simplemente no aparecerán fotos.
+const FOTOS = [
+  // "img/foto1.jpg",
+  // "img/foto2.jpg",
+];
+
+// Flores flotantes: tulipanes, rosas y amapolas.
+// No existe emoji oficial de amapola, así que se usa 🌺 como la más parecida.
+const FLORES = [
+  "🌷","🌹","🌺","🌷","🌹","🌺","🌷","🌹",
+  "🌺","🌷","🌹","🌺","🌷","🌹","🌺","🌷",
+  "🌹","🌺","🌷","🌹",
+];
+
+/* ========================================================================= */
+
+function iniciarUniverso(THREE){
+  const canvas = document.getElementById("universo");
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x05030c, 0.006);
+
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+
+  /* ---------- Cámara orbital manual (arrastrar + zoom) ---------- */
+  const cam = { radius: 55, minRadius: 12, maxRadius: 140, theta: 0.6, phi: 1.25 };
+  function actualizarCamara() {
+    cam.phi = Math.max(0.25, Math.min(Math.PI - 0.25, cam.phi));
+    camera.position.set(
+      cam.radius * Math.sin(cam.phi) * Math.sin(cam.theta),
+      cam.radius * Math.cos(cam.phi),
+      cam.radius * Math.sin(cam.phi) * Math.cos(cam.theta)
+    );
+    camera.lookAt(0, 0, 0);
+  }
+  actualizarCamara();
+
+  let arrastrando = false, prevX = 0, prevY = 0;
+  canvas.addEventListener("pointerdown", e => { arrastrando = true; prevX = e.clientX; prevY = e.clientY; });
+  window.addEventListener("pointerup", () => arrastrando = false);
+  window.addEventListener("pointermove", e => {
+    if (!arrastrando) return;
+    const dx = e.clientX - prevX, dy = e.clientY - prevY;
+    prevX = e.clientX; prevY = e.clientY;
+    cam.theta -= dx * 0.005;
+    cam.phi -= dy * 0.005;
+    actualizarCamara();
+  });
+  canvas.addEventListener("wheel", e => {
+    e.preventDefault();
+    cam.radius = Math.min(cam.maxRadius, Math.max(cam.minRadius, cam.radius + e.deltaY * 0.05));
+    actualizarCamara();
+  }, { passive: false });
+
+  // Zoom con pellizco (móvil)
+  let distanciaPrevia = null;
+  canvas.addEventListener("touchmove", e => {
+    if (e.touches.length === 2) {
+      const [t1, t2] = e.touches;
+      const d = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      if (distanciaPrevia !== null) {
+        cam.radius = Math.min(cam.maxRadius, Math.max(cam.minRadius, cam.radius - (d - distanciaPrevia) * 0.15));
+        actualizarCamara();
+      }
+      distanciaPrevia = d;
+    }
+  }, { passive: true });
+  canvas.addEventListener("touchend", () => distanciaPrevia = null);
+
+  /* ---------- Campo de estrellas ---------- */
+  function crearEstrellas(cantidad, tamaño, color, radio) {
+    const posiciones = new Float32Array(cantidad * 3);
+    for (let i = 0; i < cantidad; i++) {
+      const r = radio * (0.3 + Math.random() * 0.7);
+      const t = Math.random() * Math.PI * 2;
+      const p = Math.acos(2 * Math.random() - 1);
+      posiciones[i * 3]     = r * Math.sin(p) * Math.cos(t);
+      posiciones[i * 3 + 1] = r * Math.sin(p) * Math.sin(t);
+      posiciones[i * 3 + 2] = r * Math.cos(p);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(posiciones, 3));
+    const mat = new THREE.PointsMaterial({ size: tamaño, color, transparent: true, opacity: 0.9, depthWrite: false });
+    return new THREE.Points(geo, mat);
+  }
+  scene.add(crearEstrellas(2600, 0.5, 0xffffff, 400));
+  scene.add(crearEstrellas(500, 0.9, 0xffe9a8, 250));
+
+  /* ---------- Agujero negro con anillo dorado ---------- */
+  const nucleo = new THREE.Mesh(
+    new THREE.SphereGeometry(3.2, 48, 48),
+    new THREE.MeshBasicMaterial({ color: 0x000000 })
+  );
+  scene.add(nucleo);
+
+  const halo = new THREE.Mesh(
+    new THREE.SphereGeometry(3.6, 48, 48),
+    new THREE.MeshBasicMaterial({ color: 0xff00c8, transparent: true, opacity: 0.14 })
+  );
+  scene.add(halo);
+
+  const anillo = new THREE.Mesh(
+    new THREE.RingGeometry(4.2, 7.5, 96),
+    new THREE.MeshBasicMaterial({ color: 0xff33cc, side: THREE.DoubleSide, transparent: true, opacity: 0.8 })
+  );
+  anillo.rotation.x = Math.PI / 2.4;
+  scene.add(anillo);
+
+  const anillo2 = anillo.clone();
+  anillo2.material = anillo.material.clone();
+  anillo2.material.opacity = 0.35;
+  anillo2.scale.set(1.35, 1.35, 1.35);
+  anillo2.rotation.x = Math.PI / 2.1;
+  anillo2.rotation.z = 0.4;
+  scene.add(anillo2);
+
+  /* ---------- Texto flotante (sprites generados en canvas) ---------- */
+  function crearSpriteTexto(texto, color = "#fff3c4") {
+    const c = document.createElement("canvas");
+    const ctx = c.getContext("2d");
+    const escala = 64;
+    ctx.font = `${escala}px "Caveat"`;
+    const ancho = Math.max(200, ctx.measureText(texto).width + 40);
+    c.width = ancho; c.height = escala * 1.6;
+
+    ctx.font = `${escala}px "Caveat"`;
+    ctx.textBaseline = "middle";
+    ctx.shadowColor = "#ffb703";
+    ctx.shadowBlur = 18;
+    ctx.fillStyle = color;
+    ctx.fillText(texto, 20, c.height / 2);
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.minFilter = THREE.LinearFilter;
+    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false });
+    const sprite = new THREE.Sprite(mat);
+    const escalaMundo = c.width / 60;
+    sprite.scale.set(escalaMundo, escalaMundo * (c.height / c.width), 1);
+    return sprite;
+  }
+
+  function crearSpriteFlor(emoji) {
+    const c = document.createElement("canvas");
+    const ctx = c.getContext("2d");
+    const escala = 110;
+    c.width = escala * 1.3; c.height = escala * 1.3;
+    ctx.font = `${escala}px sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(emoji, c.width / 2, c.height / 2 + 6);
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.minFilter = THREE.LinearFilter;
+    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false });
+    const sprite = new THREE.Sprite(mat);
+    const escalaMundo = 3 + Math.random() * 2;
+    sprite.scale.set(escalaMundo, escalaMundo, 1);
+    return sprite;
+  }
+
+  function construirEscenaFlores() {
+    const grupoFlores = new THREE.Group();
+    FLORES.forEach(emoji => {
+      const sprite = crearSpriteFlor(emoji);
+      const radio = 14 + Math.random() * 20;
+      const t = Math.random() * Math.PI * 2;
+      const p = Math.acos(2 * Math.random() - 1);
+      sprite.position.set(
+        radio * Math.sin(p) * Math.cos(t),
+        radio * Math.sin(p) * Math.sin(t) * 0.6,
+        radio * Math.cos(p)
+      );
+      sprite.userData = { base: sprite.position.clone(), fase: Math.random() * Math.PI * 2 };
+      grupoFlores.add(sprite);
+    });
+    scene.add(grupoFlores);
+    animables.push(grupoFlores);
+  }
+
+  // Espera a que la fuente cargue para que el texto no se vea con la fuente por defecto
+  document.fonts.load('64px "Caveat"').then(construirEscenaTexto);
+  function construirEscenaTexto() {
+    const grupoTextos = new THREE.Group();
+    FRASES.forEach((frase, i) => {
+      const sprite = crearSpriteTexto(frase);
+      const radio = 16 + Math.random() * 18;
+      const t = Math.random() * Math.PI * 2;
+      const p = Math.acos(2 * Math.random() - 1);
+      sprite.position.set(
+        radio * Math.sin(p) * Math.cos(t),
+        radio * Math.sin(p) * Math.sin(t) * 0.6,
+        radio * Math.cos(p)
+      );
+      sprite.userData = { base: sprite.position.clone(), fase: Math.random() * Math.PI * 2 };
+      grupoTextos.add(sprite);
+    });
+    scene.add(grupoTextos);
+    animables.push(grupoTextos);
+  }
+
+  /* ---------- Fotos flotantes ---------- */
+  const cargador = new THREE.TextureLoader();
+  const grupoFotos = new THREE.Group();
+  FOTOS.forEach((ruta, i) => {
+    cargador.load(ruta, textura => {
+      const rel = textura.image.width / textura.image.height || 1;
+      const alto = 7;
+      const geo = new THREE.PlaneGeometry(alto * rel, alto);
+      const mat = new THREE.MeshBasicMaterial({ map: textura, transparent: true, side: THREE.DoubleSide });
+      const marco = new THREE.Mesh(geo, mat);
+      const radio = 20 + Math.random() * 14;
+      const t = (i / Math.max(1, FOTOS.length)) * Math.PI * 2 + Math.random();
+      const p = Math.PI / 2 + (Math.random() - 0.5) * 1.4;
+      marco.position.set(
+        radio * Math.sin(p) * Math.cos(t),
+        radio * Math.sin(p) * Math.sin(t) * 0.6,
+        radio * Math.cos(p)
+      );
+      marco.userData = { base: marco.position.clone(), fase: Math.random() * Math.PI * 2 };
+      grupoFotos.add(marco);
+    });
+  });
+  scene.add(grupoFotos);
+  const animables = [grupoFotos];
+  construirEscenaFlores();
+
+  /* ---------- Bucle de animación ---------- */
+  const reloj = new THREE.Clock();
+  function animar() {
+    const t = reloj.getElapsedTime();
+
+    anillo.rotation.z = t * 0.06;
+    anillo2.rotation.z = -t * 0.04;
+    nucleo.rotation.y = t * 0.1;
+
+    animables.forEach(grupo => {
+      grupo.children.forEach(obj => {
+        const { base, fase } = obj.userData;
+        if (!base) return;
+        obj.position.y = base.y + Math.sin(t * 0.6 + fase) * 0.6;
+        obj.lookAt(camera.position); // que siempre miren hacia la cámara
+      });
+    });
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(animar);
+  }
+  animar();
+
+  window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+}
+</script>
+</body>
+</html>
